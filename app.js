@@ -12,6 +12,7 @@ const puserRouter = require('./routes/pusers.route');
 const loadRouter = require('./routes/load.route');
 const portRouter = require('./routes/portefeuille.route');
 const authRouter = require('./routes/auth/auth');
+const countRouter = require('./routes/count.route');
 const LocalStrategy = require('passport-local').Strategy
 const passport = require('passport')
 const passportJWT = require("passport-jwt");
@@ -26,8 +27,13 @@ passport.use('local', new LocalStrategy({
    passwordField: 'password',
    session: false
 } , function (idgasi, password, done){
-  
-  connection.query('select * from User where idgasi = ?', [idgasi], function(err, result){
+
+  let sql= 'SELECT idgasi , Name, Fonction, Function_id, Team, Team_id, P_User, Libelle_APE, APE_id, password ' 
+  sql += 'from User INNER JOIN Fonction ON User.Function_id = Fonction.id_Fonction '
+  sql += 'LEFT JOIN Team ON User.Team_id = Team.id_Team '
+  sql += 'LEFT JOIN APE ON User.APE_id = APE.id_APE '
+  sql += 'WHERE idgasi = ?'
+  connection.query(sql, [idgasi], function(err, result){
       console.log(err); console.log(result);
     if (err) return done(err);
     if(!result.length){ 
@@ -52,7 +58,7 @@ return done(null, jwtPayload);
 ));
 
 // Application middleware to ensure all the data received is converted to json
-app.use(express.json());
+// app.use(express.json());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -63,7 +69,6 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
   next();
 });
-
 
 // The connection.connect is responsible for checking to see if we are connecting
 // to the database as expected
@@ -79,20 +84,20 @@ connection.connect((err) => {
 // j'implémente la partie API
 app.use('/auth', authRouter);
 
-//test
-app.get('/profile', passport.authenticate('jwt', { session:  false }),function (req, res) {
-    res.send(req.user);
-    })
-
+//list for dropdown register and update profile
 app.use('/fonctions', fonctionRouter)
 app.use('/teams', teamRouter)
 app.use('/apes', apeRouter)
 app.use('/pusers', puserRouter)
 
+//count navbar
+app.use('/count', countRouter)
+
+
 app.use('/api/load', loadRouter)
 app.use('/api/sourceefo', portRouter) 
     
-/// dans le cas d'une route non trouvée, je retourne le code 404 'Not Found'
+//dans le cas d'une route non trouvée, je retourne le code 404 'Not Found'
 app.use(function(req, res, next) {
     var  err  =  new  Error('Not Found');
     err.status  =  404;
