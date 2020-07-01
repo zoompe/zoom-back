@@ -18,8 +18,13 @@ const passport = require('passport')
 const passportJWT = require("passport-jwt");
 const bcrypt = require('bcrypt')
 const  app  =  express();
+const morgan = require('morgan')
 const ExtractJWT = passportJWT.ExtractJwt;
 const JWTStrategy = passportJWT.Strategy;
+
+// Responsible for logging the routes
+app.use(morgan('dev'));
+
 
 //strategy
 passport.use('local', new LocalStrategy({
@@ -28,13 +33,13 @@ passport.use('local', new LocalStrategy({
    session: false
 } , function (idgasi, password, done){
 
-  let sql= 'SELECT idgasi , Name, Fonction, Function_id, Team, Team_id, P_User, Libelle_APE, APE_id, password ' 
-  sql += 'from User INNER JOIN Fonction ON User.Function_id = Fonction.id_Fonction '
-  sql += 'LEFT JOIN Team ON User.Team_id = Team.id_Team '
-  sql += 'LEFT JOIN APE ON User.APE_id = APE.id_APE '
+  let sql= 'SELECT idgasi , name, fonction, fonction_id, team, team_id, p_user, libelle_ape, ape_id, password ' 
+  sql += 'from User INNER JOIN Fonction ON User.fonction_id = Fonction.id_fonction '
+  sql += 'LEFT JOIN Team ON User.team_id = Team.id_team '
+  sql += 'LEFT JOIN APE ON User.ape_id = APE.id_ape '
   sql += 'WHERE idgasi = ?'
   connection.query(sql, [idgasi], function(err, result){
-      console.log(err); console.log(result);
+      // console.log(err); console.log(result);
     if (err) return done(err);
     if(!result.length){ 
         return done(null, false, {message: 'Invalid idgasi'})
@@ -94,7 +99,7 @@ app.use('/pusers', puserRouter)
 app.use('/count', countRouter)
 
 
-app.use('/api/load', loadRouter)
+app.use('/load', loadRouter)
 app.use('/api/sourceefo', portRouter) 
     
 //dans le cas d'une route non trouvée, je retourne le code 404 'Not Found'

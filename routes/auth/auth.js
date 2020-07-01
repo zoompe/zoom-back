@@ -9,10 +9,10 @@ const jwt = require('jsonwebtoken');
 router.post('/signup', function(req, res, next) {
         
   const hash = bcrypt.hashSync(req.body.password, 10);
-  const { idgasi, name, function_id, team_id, p_user, ape_id  } = req.body;
-  const userValue= [idgasi, name, function_id, team_id, p_user, ape_id, hash ]
+  const { idgasi, name, fonction_id, team_id, p_user, ape_id  } = req.body;
+  const userValue= [idgasi, name, fonction_id, team_id, p_user, ape_id, hash ]
   
-        connection.query('INSERT INTO User (idgasi, name, function_id, team_id, p_user, ape_id, password) VALUES (?, ?, ?, ?, ?, ?, ?)', userValue, (err, results) => {
+        connection.query('INSERT INTO User (idgasi, name, fonction_id, team_id, p_user, ape_id, password) VALUES (?, ?, ?, ?, ?, ?, ?)', userValue, (err, results) => {
             if (err) {
                 return res.status(500).json({
                   flash: err.message,
@@ -42,32 +42,15 @@ router.post('/signup', function(req, res, next) {
     })
 
 //profile
-    // router.get('/profile/:idgasi', passport.authenticate('jwt', { session:  false }), (req, res) => {
-    //   const idgasiUser = req.params.idgasi;
-    //   let sql= 'SELECT idgasi , Name, Fonction, Function_id, Team, Team_id, P_User, Libelle_APE, APE_id ' 
-    //   sql += 'from User INNER JOIN Fonction ON User.Function_id = Fonction.id_Fonction '
-    //   sql += 'LEFT JOIN Team ON User.Team_id = Team.id_Team '
-    //   sql += 'LEFT JOIN APE ON User.APE_id = APE.id_APE '
-    //   sql += 'WHERE idgasi = ?'
-    //   connection.query(sql, [idgasiUser], (err, results) => {
-    //     if (err) {
-    //       return res.status(500).send(`An error occurred: ${err.message}`);
-    //     }
-    //     if (results.length === 0) {
-    //       return res.status(404).send('user not found');
-    //     }
-
-    //     return res.json(results[0]);
-    //   });
-    // }); 
-    router.get('/profile', passport.authenticate('jwt', { session:  false }),function (req, res) {
+       router.get('/profile', passport.authenticate('jwt', { session:  false }),function (req, res) {
       res.send(req.user);
       })
 
 //update user 
-router.put('/profile/:idgasi',passport.authenticate('jwt', { session:  false }), (req, res) => {
+
+router.put('/update/:idgasi', passport.authenticate('jwt', { session:  false }),  (req, res) => {
   const idgasi = req.params.idgasi;
-  return connection.query('UPDATE User SET function_id = ? , team_id = ? , p_user = ? , ape_id = ? WHERE idgasi = ?', [req.body.function_id , req.body.team_id , req.body.p_user , req.body.ape_id , idgasi], (err) => {
+  return connection.query('UPDATE User SET fonction_id = ? , team_id = ? , p_user = ? , ape_id = ? WHERE idgasi = ?', [req.body.function_id , req.body.team_id , req.body.p_user , req.body.ape_id , idgasi], (err) => {
     // console.log(query)
     if (err) {
       return res.status(500).json({
@@ -84,7 +67,6 @@ router.put('/profile/:idgasi',passport.authenticate('jwt', { session:  false }),
       }
       const updatedUser = records[0];
       return res
-
         .status(200)
         .json(updatedUser);
     });
