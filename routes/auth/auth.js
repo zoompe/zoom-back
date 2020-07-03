@@ -50,9 +50,11 @@ router.post('/signup', function(req, res, next) {
 
 router.put('/update/:idgasi', passport.authenticate('jwt', { session:  false }),  (req, res) => {
   const idgasi = req.params.idgasi;
-  return connection.query('UPDATE User SET fonction_id = ? , team_id = ? , p_user = ? , ape_id = ? WHERE idgasi = ?', [req.body.function_id , req.body.team_id , req.body.p_user , req.body.ape_id , idgasi], (err) => {
-    // console.log(query)
+  console.log(req.body)
+  return connection.query('UPDATE User SET fonction_id = ? , team_id = ? , p_user = ? , ape_id = ? WHERE idgasi = ?', [req.body.fonction_id , req.body.team_id , req.body.p_user , req.body.ape_id , idgasi], (err) => {
+    //console.log(query)
     if (err) {
+      console.log(err)
       return res.status(500).json({
         error: err.message,
         sql: err.sql,
@@ -68,7 +70,7 @@ router.put('/update/:idgasi', passport.authenticate('jwt', { session:  false }),
       const updatedUser = records[0];
       return res
         .status(200)
-        .json(updatedUser);
+        .json({updatedUser, flash:  `User updated!`});
     });
   }); 
 },

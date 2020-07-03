@@ -10,7 +10,7 @@ const teamRouter = require('./routes/team.route');
 const apeRouter = require('./routes/ape.route');
 const puserRouter = require('./routes/pusers.route');
 const loadRouter = require('./routes/load.route');
-const portRouter = require('./routes/portefeuille.route');
+const jalonRouter = require('./routes/jalons.route');
 const authRouter = require('./routes/auth/auth');
 const countRouter = require('./routes/count.route');
 const LocalStrategy = require('passport-local').Strategy
@@ -86,7 +86,7 @@ connection.connect((err) => {
 })
 
 //routes
-// j'implémente la partie API
+// signin signup
 app.use('/auth', authRouter);
 
 //list for dropdown register and update profile
@@ -98,11 +98,13 @@ app.use('/pusers', puserRouter)
 //count navbar
 app.use('/count', countRouter)
 
-
+//administration load files test
 app.use('/load', loadRouter)
-app.use('/api/sourceefo', portRouter) 
+
+//jalons
+app.use('/jalons', jalonRouter) 
     
-//dans le cas d'une route non trouvée, je retourne le code 404 'Not Found'
+//route 'Not Found'
 app.use(function(req, res, next) {
     var  err  =  new  Error('Not Found');
     err.status  =  404;
