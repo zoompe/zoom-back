@@ -104,9 +104,11 @@ router.get('/efo', passport.authenticate('jwt', { session:  false }), (req,resp)
 //http://localhost:5000/count/diag?colonne113=O
 router.get('/diag', passport.authenticate('jwt', { session:  false }), (req,resp) =>{
     const query = req.query;
-    let sql = `SELECT "${Object.keys(query)[0]}" as name,COUNT(dc_individu_local) AS nb`
-    sql += ' FROM T_Portefeuille INNER JOIN APE ON T_Portefeuille.dc_structureprincipalede = APE.id_ape'
-    sql += ' WHERE dc_situationde = 2'
+    let sql = "SELECT x.name, x.nb, Diag.groupe2 FROM ("
+
+        sql += `SELECT "${Object.keys(query)[0]}" as name,COUNT(dc_individu_local) AS nb`
+        sql += ' FROM T_Portefeuille INNER JOIN APE ON T_Portefeuille.dc_structureprincipalede = APE.id_ape'
+        sql += ' WHERE dc_situationde = 2'
 
     let sqlValues = [];
     
@@ -114,6 +116,8 @@ router.get('/diag', passport.authenticate('jwt', { session:  false }), (req,resp
         sql += ` AND ${key} = ?`
         sqlValues.push(query[key])
     })
+
+    sql += ') x , Diag WHERE x.name = Diag.name'
     console.log(sql)
     connection.query(sql, sqlValues, (err, results) => {
         if (err) {
