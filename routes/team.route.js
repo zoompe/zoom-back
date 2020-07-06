@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const connection = require('../db');
 
-// GET - Retrieve all of the data from table team
+// GET - Retrieve all of the data from table team dropdown
 router.get('/', (req, res) => {
     connection.query('SELECT * FROM Team', (err, results) => {
       if (err) {
