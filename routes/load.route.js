@@ -7,7 +7,7 @@ const router = express.Router();
 const connection = require('../db');
 const passport = require('passport');
 
- //test
+ //test load admin
  router.post('/', passport.authenticate('jwt', { session:  false }), (req,resp) =>{
     const req_arr = Object.values(req.body).map((v) => Object.values(v));
      console.log(req_arr)

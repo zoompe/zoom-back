@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const connection = require('../db');
 
-// GET - Retrieve all of the data from table fonction exept "admin"
+// GET - Retrieve all of the data from table fonction exept "admin" dropdown
 router.get('/', (req, res) => {
     connection.query('SELECT * FROM Fonction where id_fonction <> 6', (err, results) => {
       if (err) {

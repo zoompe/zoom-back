@@ -8,7 +8,6 @@ const connection = require('../db');
 const passport = require('passport');
 
  //count portefeuille
-// passport.authenticate('jwt', { session:  false })
  router.get('/portefeuille', passport.authenticate('jwt', { session:  false }), (req,resp) =>{
     let fieldValue = ''
 
@@ -94,6 +93,40 @@ router.get('/efo', passport.authenticate('jwt', { session:  false }), (req,resp)
             if (!results.length) {
                 resp.status(404).send('datas not found')
             } else {
+                resp.json(results)
+            }
+        }
+    })
+})
+//END
+
+//count diag //important start by diag before user in url
+//http://localhost:5000/count/diag?colonne113=O
+router.get('/diag', passport.authenticate('jwt', { session:  false }), (req,resp) =>{
+    const query = req.query;
+    let sql = "SELECT x.name, x.nb, Diag.groupe2 FROM ("
+
+        sql += `SELECT "${Object.keys(query)[0]}" as name,COUNT(dc_individu_local) AS nb`
+        sql += ' FROM T_Portefeuille INNER JOIN APE ON T_Portefeuille.dc_structureprincipalede = APE.id_ape'
+        sql += ' WHERE dc_situationde = 2'
+
+    let sqlValues = [];
+    
+    Object.keys(query).map((key, index) => {
+        sql += ` AND ${key} = ?`
+        sqlValues.push(query[key])
+    })
+
+    sql += ') x , Diag WHERE x.name = Diag.name'
+    console.log(sql)
+    connection.query(sql, sqlValues, (err, results) => {
+        if (err) {
+            resp.status(500).send('Internal server error')
+        } else {
+            if (!results.length) {
+                resp.status(404).send('datas not found')
+            } else {
+                // console.log(json(results))
                 resp.json(results)
             }
         }
