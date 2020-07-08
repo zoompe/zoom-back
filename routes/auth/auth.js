@@ -50,7 +50,7 @@ router.post('/signup', function(req, res, next) {
 
 router.put('/update/:idgasi', passport.authenticate('jwt', { session:  false }),  (req, res) => {
   const idgasi = req.params.idgasi;
-  console.log(req.body)
+  // console.log(req.body)
   return connection.query('UPDATE User SET fonction_id = ? , team_id = ? , p_user = ? , ape_id = ? WHERE idgasi = ?', [req.body.fonction_id , req.body.team_id , req.body.p_user , req.body.ape_id , idgasi], (err) => {
     //console.log(query)
     if (err) {
