@@ -13,6 +13,7 @@ const loadRouter = require('./routes/load.route');
 const jalonRouter = require('./routes/jalons.route');
 const authRouter = require('./routes/auth/auth');
 const countRouter = require('./routes/count.route');
+const efoRouter = require('./routes/efo.route');
 const LocalStrategy = require('passport-local').Strategy
 const passport = require('passport')
 const passportJWT = require("passport-jwt");
@@ -102,7 +103,10 @@ app.use('/count', countRouter)
 app.use('/load', loadRouter)
 
 //jalons
-app.use('/jalons', jalonRouter) 
+app.use('/jalons', jalonRouter)
+
+//efo
+app.use('/efo', efoRouter)
     
 //route 'Not Found'
 app.use(function(req, res, next) {

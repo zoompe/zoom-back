@@ -118,7 +118,7 @@ router.get('/diag', passport.authenticate('jwt', { session:  false }), (req,resp
     })
 
     sql += ') x , Diag WHERE x.name = Diag.name'
-    console.log(sql)
+    // console.log(sql)
     connection.query(sql, sqlValues, (err, results) => {
         if (err) {
             resp.status(500).send('Internal server error')
