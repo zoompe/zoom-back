@@ -7,7 +7,7 @@ const router = express.Router();
 const connection = require('../db');
 const passport = require('passport');
 
- //count portefeuille
+ //count portefeuille nav
  router.get('/portefeuille', passport.authenticate('jwt', { session:  false }), (req,resp) =>{
     let fieldValue = ''
 
@@ -54,7 +54,7 @@ const passport = require('passport');
 })
 //END
 
-//count EFO
+//count EFO nav
 router.get('/efo', passport.authenticate('jwt', { session:  false }), (req,resp) =>{
     let fieldValue = ''
 
