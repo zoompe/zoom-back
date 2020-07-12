@@ -110,7 +110,7 @@ app.use('/jalons', jalonRouter)
 app.use('/efo', efoRouter)
 
 //export diag
-app.use('/diagcsv', diagExcel)
+app.use('/diagxlsx', diagExcel)
     
 //route 'Not Found'
 app.use(function(req, res, next) {
