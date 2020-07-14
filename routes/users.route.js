@@ -57,32 +57,6 @@ router.get(
 
 //END
 
-//Modify online status when user is connected
-//http://localhost:5000/users/connection/zz
-
-// router.put(
-//   '/connection/:id',
-//   passport.authenticate('jwt', { session: false }),
-//   (req, res) => {
-//     const id = req.params.id;
-//     console.log(id);
-//     connection.query(
-//       'UPDATE User SET isOnline = 1 WHERE idgasi = ?',
-//       [id],
-//       (err, results) => {
-//         if (err) {
-//           res.status(500).send('Internal server error');
-//         } else {
-//           if (!results.length) {
-//             res.status(404).send('data not found');
-//           } else {
-//             res.json(results);
-//           }
-//         }
-//       },
-//     );
-//   },
-// );
 
 router.put('/connection/:idgasi',  (req, res) => {
   const idgasi = req.params.idgasi;
@@ -111,32 +85,7 @@ router.put('/connection/:idgasi',  (req, res) => {
 );
 
 
-//Modify online status when user is disconnected
-// router.put(
-//   '/disconnection/:id',
-//   passport.authenticate('jwt', { session: false }),
-//   (req, res) => {
-//     const id = req.params.id;
-//     console.log(id);
-//     connection.query(
-//       'UPDATE User SET isOnline = 0 WHERE idgasi = ?',
-//       [id],
-//       (err, results) => {
-//         if (err) {
-//           res.status(500).send('Internal server error');
-//         } else {
-//           if (!results.length) {
-//             res.status(404).send('data not found');
-//           } else {
-//             res.json(results);
-//           }
-//         }
-//       },
-//     );
-//   },
-// );
-
-router.put('/disconnection/:idgasi',  (req, res) => {
+router.post('/disconnection/:idgasi',  (req, res) => {
   const idgasi = req.params.idgasi;
   // const formData = req.body;
   return connection.query('UPDATE User SET isOnline = 0 WHERE idgasi = ?', [ idgasi], (err) => {

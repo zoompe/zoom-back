@@ -13,6 +13,7 @@ const loadRouter = require('./routes/load.route');
 const jalonRouter = require('./routes/jalons.route');
 const authRouter = require('./routes/auth/auth');
 const countRouter = require('./routes/count.route');
+const activiteRouter = require('./routes/activite.route');
 const usersRouter = require('./routes/users.route');
 const diagExcel = require ('./routes/diagxls.route')
 const efoExcel = require ('./routes/efoxls.route')
@@ -122,6 +123,9 @@ app.use('/jalons', jalonRouter);
 
 //efo
 app.use('/efo', efoRouter);
+
+//activités
+app.use('/activites',activiteRouter)
 
 //onlineusers and count of onlineusers
 app.use('/users', usersRouter);
