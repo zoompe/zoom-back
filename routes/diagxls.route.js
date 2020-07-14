@@ -4,7 +4,7 @@ const router = express.Router();
 const connection = require('../db');
 const passport = require('passport');
 const excel = require('exceljs');
-const { response } = require('express');
+// const { response } = require('express');
 
 
 //select excel diag ide
@@ -126,7 +126,7 @@ router.use('/ref', passport.authenticate('jwt', { session:  false }), (req,resp)
                     } else {
                 const jsonResult = JSON.parse(JSON.stringify(results));
                 let workbook = new excel.Workbook(); //creating workbook
-                let worksheet = workbook.addWorksheet('IDE'); //creating worksheet
+                let worksheet = workbook.addWorksheet('REF'); //creating worksheet
                 worksheet.columns = [
                     { header: 'dc_dernieragentreferent', key: 'dc_dernieragentreferent', width: 20 },
                     { header: 'nbDECriteres', key: 'nbDECriteres', width: 10 },
@@ -207,7 +207,7 @@ router.use('/ape', passport.authenticate('jwt', { session:  false }), (req,resp)
                     } else {
                 const jsonResult = JSON.parse(JSON.stringify(results));
                 let workbook = new excel.Workbook(); //creating workbook
-                let worksheet = workbook.addWorksheet('IDE'); //creating worksheet
+                let worksheet = workbook.addWorksheet('APE'); //creating worksheet
                 worksheet.columns = [
                     { header: 'dc_structureprincipalede', key: 'dc_structureprincipalede', width: 20 },
                     { header: 'nbDECriteres', key: 'nbDECriteres', width: 10 },
