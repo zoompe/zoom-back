@@ -6,12 +6,9 @@ const router = express.Router();
 const connection = require('../db');
 const passport = require('passport');
 
-//count portefeuille
-router.get(
-  '/portefeuille',
-  passport.authenticate('jwt', { session: false }),
-  (req, resp) => {
-    let fieldValue = '';
+ //count portefeuille nav
+ router.get('/portefeuille', passport.authenticate('jwt', { session:  false }), (req,resp) =>{
+    let fieldValue = ''
 
     let sql = 'SELECT COUNT(dc_individu_local) AS nb';
     sql +=
@@ -57,12 +54,11 @@ router.get(
 );
 //END
 
-//count EFO
-router.get(
-  '/efo',
-  passport.authenticate('jwt', { session: false }),
-  (req, resp) => {
-    let fieldValue = '';
+
+//count EFO nav
+router.get('/efo', passport.authenticate('jwt', { session:  false }), (req,resp) =>{
+    let fieldValue = ''
+
 
     let sql = 'SELECT COUNT(dc_individu_local) AS nb';
     sql +=
