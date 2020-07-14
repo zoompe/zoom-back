@@ -57,4 +57,54 @@ router.get(
 
 //END
 
+//Modify online status when user is connected
+router.put(
+  '/connection/:id',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    const id = req.params.id;
+    console.log(id);
+    connection.query(
+      'UPDATE User SET isOnline=true WHERE idgasi = ?',
+      [id],
+      (err, results) => {
+        if (err) {
+          res.status(500).send('Internal server error');
+        } else {
+          if (!results.length) {
+            res.status(404).send('data not found');
+          } else {
+            res.json(results);
+          }
+        }
+      },
+    );
+  },
+);
+
+//Modify online status when user is disconnected
+router.put(
+  '/disconnection/:id',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    const id = req.params.id;
+    console.log(id);
+    connection.query(
+      'UPDATE user SET isOnline=false WHERE idgasi = ?',
+      [id],
+      (err, results) => {
+        if (err) {
+          res.status(500).send('Internal server error');
+        } else {
+          if (!results.length) {
+            res.status(404).send('data not found');
+          } else {
+            res.json(results);
+          }
+        }
+      },
+    );
+  },
+);
+
 module.exports = router;
