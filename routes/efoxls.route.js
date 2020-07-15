@@ -4,7 +4,6 @@ const router = express.Router();
 const connection = require('../db');
 const passport = require('passport');
 const excel = require('exceljs');
-// const { response } = require('express');
 
 //select excel efo ide
 //http://localhost:5000/efoxlsx/ide?
@@ -18,13 +17,25 @@ router.use('/ide', passport.authenticate('jwt', { session:  false }), (req,resp)
     let sqlValues = [];
     
     Object.keys(query).filter((key) => query[key]!=='all').map((key, index) => {
+        
+        if (key==='dc_lblformacode') {
             if (index === 0) {
-                sql += ` WHERE ${key} = ?`
+                sql += ` WHERE ${key} LIKE "%" ? "%"`
             }
             else {
-                sql += ` AND ${key} = ?`
+                sql += ` AND ${key} LIKE "%" ? "%"`
             } 
-      
+
+        } else  {
+        
+        
+            if (index === 0) {
+                    sql += ` WHERE ${key} = ?`
+                }
+                else {
+                    sql += ` AND ${key} = ?`
+                } 
+            }
         sqlValues.push(query[key])
     })
 
@@ -113,6 +124,16 @@ router.use('/ref', passport.authenticate('jwt', { session:  false }), (req,resp)
     
     Object.keys(query).filter((key) => query[key]!=='all').map((key, index) => {
         
+        if (key==='dc_lblformacode') {
+            if (index === 0) {
+                sql += ` WHERE p1.${key} LIKE "%" ? "%"`
+            }
+            else {
+                sql += ` AND p1.${key} LIKE "%" ? "%"`
+            } 
+
+        } else  {
+
         if (key==='dt') {
             if (index === 0) {
                 sql += ` WHERE a1.${key} = ?`
@@ -131,6 +152,7 @@ router.use('/ref', passport.authenticate('jwt', { session:  false }), (req,resp)
     
             } 
         }
+    }
         sqlValues.push(query[key])
     })
 
@@ -142,6 +164,16 @@ router.use('/ref', passport.authenticate('jwt', { session:  false }), (req,resp)
     
     Object.keys(query).filter((key) => query[key]!=='all').map((key, index) => {
         
+        if (key==='dc_lblformacode') {
+            if (index === 0) {
+                sql += ` WHERE p2.${key} LIKE "%" ? "%"`
+            }
+            else {
+                sql += ` AND p2.${key} LIKE "%" ? "%"`
+            } 
+
+        } else  {
+
         if (key==='dt') {
             if (index === 0) {
                 sql += ` WHERE a2.${key} = ?`
@@ -160,6 +192,7 @@ router.use('/ref', passport.authenticate('jwt', { session:  false }), (req,resp)
     
             } 
         }
+    }
         sqlValues.push(query[key])
     })
     
@@ -170,7 +203,7 @@ router.use('/ref', passport.authenticate('jwt', { session:  false }), (req,resp)
     sql+=' (SELECT p3.dc_dernieragentreferent, count(p3.dc_individu_local) as nbDE'
     sql+=' FROM T_Portefeuille p3 INNER JOIN APE a3 ON p3.dc_structureprincipalede = a3.id_ape'
 
-    Object.keys(query).filter((key) => query[key]!=='all' && key!=='dc_statutaction_id' && key!=='dc_formacode_id').map((key, index) => {
+    Object.keys(query).filter((key) => query[key]!=='all' && key!=='dc_statutaction_id' && key!=='dc_lblformacode').map((key, index) => {
         
         if (key==='dt') {
             if (index === 0) {
@@ -226,7 +259,6 @@ router.use('/ref', passport.authenticate('jwt', { session:  false }), (req,resp)
                       resp.status(200).end();
                 });
         
-
                     }
                 }
             })

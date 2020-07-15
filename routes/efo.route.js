@@ -148,38 +148,38 @@ router.get('/listestatutaction', passport.authenticate('jwt', { session:  false 
 //list filter efo
 //liste filter statut formatcode
 //http://localhost:5000/efo/listeformacode?
-router.get('/listeformacode', passport.authenticate('jwt', { session:  false }), (req,resp) =>{
-    const query = req.query;
+// router.get('/listeformacode', passport.authenticate('jwt', { session:  false }), (req,resp) =>{
+//     const query = req.query;
  
-    let sql = 'SELECT DISTINCT dc_formacode_id, dc_lblformacode'
-        sql+= ' FROM T_EFO INNER JOIN APE ON T_EFO.dc_structureprincipalede = APE.id_ape'
+//     let sql = 'SELECT DISTINCT dc_formacode_id, dc_lblformacode'
+//         sql+= ' FROM T_EFO INNER JOIN APE ON T_EFO.dc_structureprincipalede = APE.id_ape'
         
-        let sqlValues = [];
+//         let sqlValues = [];
 
-        Object.keys(query).map((key, index) => {
-            if (index === 0) {
-                sql += ` WHERE ${key} = ?`
-            }
-            else {
-                sql += ` AND ${key} = ?`
+//         Object.keys(query).map((key, index) => {
+//             if (index === 0) {
+//                 sql += ` WHERE ${key} = ?`
+//             }
+//             else {
+//                 sql += ` AND ${key} = ?`
     
-            } 
-            sqlValues.push(query[key]) 
-        })
-    connection.query(sql, sqlValues, (err, results) => {
-        if (err) {
-            resp.status(500).send('Internal server error')
-        } else {
-            if (!results.length) {
-                resp.status(404).send('datas not found')
-                // resp.json([])
-            } else {
-                // console.log(json(results))
-                resp.json(results)
-            }
-        }
-    })
-})
+//             } 
+//             sqlValues.push(query[key]) 
+//         })
+//     connection.query(sql, sqlValues, (err, results) => {
+//         if (err) {
+//             resp.status(500).send('Internal server error')
+//         } else {
+//             if (!results.length) {
+//                 resp.status(404).send('datas not found')
+//                 // resp.json([])
+//             } else {
+//                 // console.log(json(results))
+//                 resp.json(results)
+//             }
+//         }
+//     })
+// })
 
 //nb efo
 //http://localhost:5000/efo?
@@ -196,24 +196,35 @@ router.get('/', passport.authenticate('jwt', { session:  false }), (req,resp) =>
    
     Object.keys(query).filter((key) => query[key]!=='all').map((key, index) => {
         
-            if (key==='dt') {
-                if (index === 0) {
-                    sql += ` WHERE ${key} = ?`
-                }
-                else {
-                    sql += ` AND ${key} = ?`
-        
-                } 
+        // dc_lblformacode
+        if (key==='dc_lblformacode') {
+            if (index === 0) {
+                sql += ` WHERE t2.${key} LIKE "%" ? "%"`
             }
             else {
-                if (index === 0) {
-                    sql += ` WHERE t2.${key} = ?`
-                }
-                else {
-                    sql += ` AND t2.${key} = ?`
-                } 
-            }
-            
+                sql += ` AND t2.${key} LIKE "%" ? "%"`
+            } 
+
+        } else  {
+        
+                    if (key==='dt') {
+                            if (index === 0) {
+                                sql += ` WHERE ${key} = ?`
+                            }
+                            else {
+                                sql += ` AND ${key} = ?`
+                    
+                            } 
+                        }
+                        else {
+                            if (index === 0) {
+                                sql += ` WHERE t2.${key} = ?`
+                            }
+                            else {
+                                sql += ` AND t2.${key} = ?`
+                            } 
+                        }
+                    }        
             sqlValues.push(query[key])
         })
     
@@ -222,7 +233,7 @@ router.get('/', passport.authenticate('jwt', { session:  false }), (req,resp) =>
     sql+="(SELECT COUNT(DISTINCT dc_individu_local) AS nbDE"
     sql += ' FROM T_Portefeuille INNER JOIN APE ON T_Portefeuille.dc_structureprincipalede = APE.id_ape'
     
-    Object.keys(query).filter((key) => query[key]!=='all' && key!=='dc_statutaction_id' && key!=='dc_formacode_id').map((key, index) => {
+    Object.keys(query).filter((key) => query[key]!=='all' && key!=='dc_statutaction_id' && key!=='dc_lblformacode').map((key, index) => {
         if (index === 0) {
             sql += ` WHERE ${key} = ?`
         }
@@ -238,25 +249,35 @@ router.get('/', passport.authenticate('jwt', { session:  false }), (req,resp) =>
     
     Object.keys(query).filter((key) => query[key]!=='all').map((key, index) => {
         
-        if (key==='dt') {
+        if (key==='dc_lblformacode') {
             if (index === 0) {
-                sql += ` WHERE ${key} = ?`
+                sql += ` WHERE t1.${key} LIKE "%" ? "%"`
             }
             else {
-                sql += ` AND ${key} = ?`
-    
+                sql += ` AND t1.${key} LIKE "%" ? "%"`
             } 
-        }
-        else {
-            if (index === 0) {
-                sql += ` WHERE t1.${key} = ?`
-            }
-            else {
-                sql += ` AND t1.${key} = ?`
-    
-            } 
-        }
+
+        } else  {
         
+                if (key==='dt') {
+                    if (index === 0) {
+                        sql += ` WHERE ${key} = ?`
+                    }
+                    else {
+                        sql += ` AND ${key} = ?`
+            
+                    } 
+                }
+                else {
+                    if (index === 0) {
+                        sql += ` WHERE t1.${key} = ?`
+                    }
+                    else {
+                        sql += ` AND t1.${key} = ?`
+            
+                    } 
+                }
+            }
         
         sqlValues.push(query[key])
     })
