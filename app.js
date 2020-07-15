@@ -18,6 +18,7 @@ const usersRouter = require('./routes/users.route');
 const diagExcel = require ('./routes/diagxls.route')
 const efoExcel = require ('./routes/efoxls.route')
 const jalonExcel = require ('./routes/jalonxls.route')
+const activiteExcel = require ('./routes/activitexls.route')
 const efoRouter = require('./routes/efo.route');
 const LocalStrategy = require('passport-local').Strategy;
 const passport = require('passport');
@@ -136,8 +137,9 @@ app.use('/diagxlsx', diagExcel)
 //export efo
 app.use('/efoxlsx', efoExcel)
 //export jalon
-app.use('/jalonxlsx', jalonExcel)   
-
+app.use('/jalonxlsx', jalonExcel)
+//export acti
+app.use('/activitexlsx', activiteExcel) 
 
 //route 'Not Found'
 app.use(function (req, res, next) {

@@ -84,7 +84,7 @@ router.put('/connection/:idgasi',  (req, res) => {
 },
 );
 
-
+//post instead put 
 router.post('/disconnection/:idgasi',  (req, res) => {
   const idgasi = req.params.idgasi;
   // const formData = req.body;
