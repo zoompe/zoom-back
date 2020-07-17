@@ -10,8 +10,9 @@ const passport = require('passport');
 router.get('/listesituationde', passport.authenticate('jwt', { session:  false }), (req,resp) =>{
     const query = req.query;
  
-    let sql = 'SELECT DISTINCT dc_situationde'
+    let sql = 'SELECT DISTINCT dc_situationde, libelle'
         sql+= ' FROM T_EFO INNER JOIN APE ON T_EFO.dc_structureprincipalede = APE.id_ape'
+        sql+= ' INNER JOIN Modalite ON T_EFO.dc_situationde = Modalite.id_mod'
         
         let sqlValues = [];
 
@@ -25,6 +26,8 @@ router.get('/listesituationde', passport.authenticate('jwt', { session:  false }
             } 
             sqlValues.push(query[key]) 
         })
+        
+        console.log(sql)
     connection.query(sql, sqlValues, (err, results) => {
         if (err) {
             resp.status(500).send('Internal server error')
