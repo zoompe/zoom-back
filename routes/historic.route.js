@@ -42,30 +42,5 @@ router.post(
   },
 );
 
-// router.post(
-//   '/:idgasi/:button/:date',
-//   passport.authenticate('jwt', { session: false }),
-//   (req, resp) => {
-//     const idgasi = req.params.idgasi;
-//     const date = req.params.date;
-//     const button = req.params.button;
-//     const body = [idgasi, button, date];
-//     console.log(body);
-//     connection.query(
-//       'INSERT INTO historic (idgasi, button, date) VALUES ?',
-//       [body],
-//       (err, result) => {
-//         if (err) {
-//           return resp.status(500).json({
-//             error: err.message,
-//             sql: err.sql,
-//           });
-//         } else {
-//           return resp.status(201);
-//         }
-//       },
-//     );
-//   },
-// );
 
 module.exports = router;

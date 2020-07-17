@@ -40,41 +40,6 @@ router.get('/listestructure', passport.authenticate('jwt', { session:  false }),
     })
 })
 
-//liste filter ref
-//http://localhost:5000/activites/listeref?
-router.get('/listeref', passport.authenticate('jwt', { session:  false }), (req,resp) =>{
-    const query = req.query;
- 
-    let sql = 'SELECT DISTINCT dc_agentreferent'
-        sql+= ' FROM T_Activites INNER JOIN APE ON T_Activites.dc_structureprincipalesuivi = APE.id_ape'
-        
-        let sqlValues = [];
-
-        Object.keys(query).map((key, index) => {
-            if (index === 0) {
-                sql += ` WHERE ${key} = ?`
-            }
-            else {
-                sql += ` AND ${key} = ?`
-    
-            } 
-            sqlValues.push(query[key]) 
-        })
-
-
-    connection.query(sql, sqlValues, (err, results) => {
-        if (err) {
-            resp.status(500).send('Internal server error')
-        } else {
-            if (!results.length) {
-                resp.status(404).send('datas not found')
-            } else {
-                // console.log(json(results))
-                resp.json(results)
-            }
-        }
-    })
-})
 
 //liste filter modalite d'acc
 //http://localhost:5000/activites/listemodeacc?
@@ -177,9 +142,6 @@ router.get('/', passport.authenticate('jwt', { session:  false }), (req,resp) =>
     
     sql+= " GROUP BY annee, mois order by annee, mois desc"
     
-    // console.log(sql)
-    // console.log(sqlValues)
-    // console.log(query)
     connection.query(sql, sqlValues, (err, results) => {
         if (err) {
             resp.status(500).send('Internal server error')
