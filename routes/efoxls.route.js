@@ -11,7 +11,7 @@ router.use('/ide', passport.authenticate('jwt', { session:  false }), (req,resp)
     const query = req.query;
    
     let sql = ""
-        sql += 'SELECT *'
+        sql += "SELECT *, DATE_FORMAT(dd_datepreconisation,'%d/%m/%Y') AS french_datepreco "
         sql += ' FROM T_EFO INNER JOIN APE ON T_EFO.dc_structureprincipalede = APE.id_ape'
 
     let sqlValues = [];
@@ -49,25 +49,42 @@ router.use('/ide', passport.authenticate('jwt', { session:  false }), (req,resp)
                     } else {
                 const jsonResult = JSON.parse(JSON.stringify(results));
                 let workbook = new excel.Workbook(); //creating workbook
-                let worksheet = workbook.addWorksheet('IDE'); //creating worksheet
+                let worksheet = workbook.addWorksheet('IDE',{views: [{showGridLines: false}]});; //creating worksheet
                 worksheet.columns = [
-                    { header: 'dc_individu_local', key: 'dc_individu_local', width: 10 },
-                    { header: 'dc_structureprincipalede', key: 'dc_structureprincipalede', width: 30 },
-                    { header: 'dc_dernieragentreferent', key: 'dc_dernieragentreferent', width: 30},
-                    { header: 'dc_civilite', key: 'dc_civilite', width: 30 },
-                    { header: 'dc_nom', key: 'dc_nom', width: 10, outlineLevel: 1},
-                    { header: 'dc_prenom', key: 'dc_prenom', width: 10, outlineLevel: 1},
-                    { header: 'dc_categorie', key: 'dc_categorie', width: 10, outlineLevel: 1},
-                    { header: 'dc_situationde', key: 'dc_situationde', width: 10, outlineLevel: 1},
-                    { header: 'dc_parcours', key: 'dc_parcours', width: 10, outlineLevel: 1},
-                    { header: 'dc_adresseemail', key: 'dc_adresseemail', width: 10, outlineLevel: 1},
-                    { header: 'dc_statutaction_id', key: 'dc_statutaction_id', width: 10, outlineLevel: 1},
-                    { header: 'dc_formacode_id', key: 'dc_formacode_id', width: 10, outlineLevel: 1},
-                    { header: 'dc_lblformacode', key: 'dc_lblformacode', width: 10, outlineLevel: 1},
-                    { header: 'dd_datepreconisation', key: 'dd_datepreconisation', width: 10, outlineLevel: 1}
+                    { header: 'IDE', key: 'dc_individu_local'},
+                    { header: 'APE', key: 'dc_structureprincipalede'},
+                    { header: 'Référent', key: 'dc_dernieragentreferent'},
+                    { header: 'Civilité', key: 'dc_civilite'},
+                    { header: 'Nom', key: 'dc_nom'},
+                    { header: 'Prénom', key: 'dc_prenom'},
+                    { header: 'Catégorie', key: 'dc_categorie'},
+                    { header: 'Situation', key: 'dc_situationde'},
+                    { header: 'Parcours', key: 'dc_parcours'},
+                    { header: 'Mail', key: 'dc_adresseemail'},
+                    { header: 'Tel', key: 'dc_telephone'},
+                    { header: 'Statut Action', key: 'dc_statutaction_id'},
+                    { header: 'Formacode', key: 'dc_formacode_id'},
+                    { header: 'Libellé Formacode', key: 'dc_lblformacode'},
+                    { header: 'Date préconisation', key: 'french_datepreco'}
                 ];
 
+              
+                worksheet.columns.forEach(column => {
+                    column.width = column.header.length < 5 ? 10 : column.header.length + 2
+                  })
+
                 worksheet.addRows(jsonResult);
+                
+                worksheet.getRow(1).eachCell((cell) => {
+                    cell.font = { bold: true };
+                  });
+                  for (let i =1; i<=worksheet.columns.length;i++){
+                  worksheet.getColumn(i).eachCell((cell) => {
+                    cell.border = {
+                        top: { style: 'thin' }, bottom: { style: 'thin' },
+                      };
+                  });
+                }
                 resp.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
                 resp.setHeader('Content-Disposition', 'attachment; filename=' + 'efoIde.xlsx');  
                 return workbook.xlsx.write(resp)
@@ -116,7 +133,7 @@ router.use('/ref', passport.authenticate('jwt', { session:  false }), (req,resp)
 
     let sql = 'Select t3.dc_dernieragentreferent, CASE WHEN t1.nbEFO  IS NULL THEN 0 ELSE t1.nbEFO END AS nbEFO,'
         sql+= ' CASE WHEN t2.nbDEEFO  IS NULL THEN 0 ELSE t2.nbDEEFO END AS nbDEEFO, t3.nbDE,'
-        sql+= ' nbDEEFO / t3. nbDE  as tx FROM'
+        sql+= ' CASE WHEN (nbDEEFO / t3. nbDE) IS NULL  THEN 0 ELSE nbDEEFO / t3. nbDE END AS tx FROM'
         sql+= '(SELECT p1.dc_dernieragentreferent, count(p1.dc_individu_local) as nbEFO'
         sql+= ' FROM T_EFO p1 INNER JOIN APE a1 ON p1.dc_structureprincipalede = a1.id_ape'
  
@@ -241,16 +258,38 @@ router.use('/ref', passport.authenticate('jwt', { session:  false }), (req,resp)
                     } else {
                 const jsonResult = JSON.parse(JSON.stringify(results));
                 let workbook = new excel.Workbook(); //creating workbook
-                let worksheet = workbook.addWorksheet('REF'); //creating worksheet
+                let worksheet = workbook.addWorksheet('REF',{views: [{showGridLines: false}]});; //creating worksheet
                 worksheet.columns = [
-                    { header: 'dc_dernieragentreferent', key: 'dc_dernieragentreferent', width: 20 },
-                    { header: 'nbEFO', key: 'nbEFO', width: 10 },
-                    { header: 'nbDEEFO', key: 'nbDEEFO', width: 10 },
-                    { header: 'nbDE', key: 'nbDE', width: 10},
-                    { header: 'taux', key: 'tx', width: 10 },
+                    { header: 'Référent', key: 'dc_dernieragentreferent'},
+                    { header: "Nombre d'EFO", key: 'nbEFO'},
+                    { header: 'Nombre de DE avec EFO', key: 'nbDEEFO' },
+                    { header: 'Nombre de DE', key: 'nbDE' },
+                    { header: 'Taux DE avec EFO', key: 'tx' },
                     
                 ];
                 worksheet.addRows(jsonResult);
+                worksheet.columns.forEach(column => {
+                    column.width = column.header.length < 10 ? 10 : column.header.length + 2
+                  })
+
+                
+                worksheet.addRows(jsonResult);
+                
+                worksheet.getRow(1).eachCell((cell) => {
+                    cell.font = { bold: true };
+                  });
+                  for (let i =1; i<=worksheet.columns.length;i++){
+                  worksheet.getColumn(i).eachCell((cell) => {
+                    cell.border = {
+                        top: { style: 'thin' }, bottom: { style: 'thin' },
+                      };
+                  });
+                }
+
+                worksheet.getColumn(5).eachCell((cell) => {
+                    cell.numFmt = '0.0%';
+                  });
+
   
                 resp.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
                 resp.setHeader('Content-Disposition', 'attachment; filename=' + 'efoREF.xlsx');  
@@ -271,10 +310,10 @@ router.use('/ref', passport.authenticate('jwt', { session:  false }), (req,resp)
 //http://localhost:5000/efoxlsx/ape?
 router.use('/ape', passport.authenticate('jwt', { session:  false }), (req,resp) => {
     const query = req.query;
-
+    
     let sql = 'Select t3.dc_structureprincipalede, CASE WHEN t1.nbEFO  IS NULL THEN 0 ELSE t1.nbEFO END AS nbEFO,'
         sql+= ' CASE WHEN t2.nbDEEFO  IS NULL THEN 0 ELSE t2.nbDEEFO END AS nbDEEFO, t3.nbDE,'
-        sql+= ' nbDEEFO / t3. nbDE  as tx FROM'
+        sql+= ' CASE WHEN (nbDEEFO / t3. nbDE) IS NULL  THEN 0 ELSE nbDEEFO / t3. nbDE END AS tx FROM'
         sql+= '(SELECT p1.dc_structureprincipalede, count(p1.dc_individu_local) as nbEFO'
         sql+= ' FROM T_EFO p1 INNER JOIN APE a1 ON p1.dc_structureprincipalede = a1.id_ape'
  
@@ -377,17 +416,46 @@ router.use('/ape', passport.authenticate('jwt', { session:  false }), (req,resp)
                     } else {
                 const jsonResult = JSON.parse(JSON.stringify(results));
                 let workbook = new excel.Workbook(); //creating workbook
-                let worksheet = workbook.addWorksheet('APE'); //creating worksheet
+                let worksheet = workbook.addWorksheet('APE',{views: [{showGridLines: false}]}); //creating worksheet
+             
                 worksheet.columns = [
-                    { header: 'dc_structureprincipalede', key: 'dc_structureprincipalede', width: 20 },
-                    { header: 'nbEFO', key: 'nbEFO', width: 10 },
-                    { header: 'nbDEEFO', key: 'nbDEEFO', width: 10 },
-                    { header: 'nbDE', key: 'nbDE', width: 10},
-                    { header: 'taux', key: 'tx', width: 10 },
+                    { header: 'APE', key: 'dc_structureprincipalede' },
+                    { header: "Nombre d'EFO", key: 'nbEFO' },
+                    { header: 'Nombre de DE avec EFO', key: 'nbDEEFO' },
+                    { header: 'Nombre de DE', key: 'nbDE' },
+                    { header: 'Taux DE avec EFO', key: 'tx' },
                     
                 ];
+                
+                
+                worksheet.columns.forEach(column => {
+                    column.width = column.header.length < 10 ? 10 : column.header.length + 2
+                  })
+
+                
                 worksheet.addRows(jsonResult);
-  
+                
+                worksheet.getRow(1).eachCell((cell) => {
+                    cell.font = { bold: true };
+                  });
+                  for (let i =1; i<=worksheet.columns.length;i++){
+                  worksheet.getColumn(i).eachCell((cell) => {
+                    cell.border = {
+                        top: { style: 'thin' }, bottom: { style: 'thin' },
+                      };
+                  });
+                }
+
+                worksheet.getColumn(5).eachCell((cell) => {
+                    cell.numFmt = '0.0%';
+                  });
+
+                //   worksheet.autoFilter = {
+                //     from: 'A1',
+                //     to: 'E1',
+                // } 
+                
+
                 resp.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
                 resp.setHeader('Content-Disposition', 'attachment; filename=' + 'efoAPE.xlsx');  
                 return workbook.xlsx.write(resp)

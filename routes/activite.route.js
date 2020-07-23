@@ -115,9 +115,9 @@ router.get('/listeyear', passport.authenticate('jwt', { session:  false }), (req
 
 
 
-//activites
-//http://localhost:5000/activites?
-router.get('/', passport.authenticate('jwt', { session:  false }), (req,resp) =>{
+//contacts
+//http://localhost:5000/activites/contacts?
+router.get('/contacts', passport.authenticate('jwt', { session:  false }), (req,resp) =>{
     const query = req.query;
    
 
@@ -141,6 +141,53 @@ router.get('/', passport.authenticate('jwt', { session:  false }), (req,resp) =>
         })
     
     sql+= " GROUP BY annee, mois order by annee, mois desc"
+    
+    connection.query(sql, sqlValues, (err, results) => {
+        if (err) {
+            resp.status(500).send('Internal server error')
+        } else {
+            if (!results.length || results===undefined) {
+                // resp.status(404).send('datas not found')
+                resp.json([])
+            } else {
+                // console.log(json(results))
+                resp.json(results)
+            }
+        }
+    })
+})
+//END
+
+//presta
+//http://localhost:5000/activites/presta?
+router.get('/presta', passport.authenticate('jwt', { session:  false }), (req,resp) =>{
+    const query = req.query;
+  
+
+    
+    let sql ="SELECT annee , mois , Sum(nb_de_affectes) AS nb_de_affectes, Sum(presta_rca) AS ACTIV_Créa, Sum(presta_aem) AS ACTIV_Emploi," 
+    sql += " Sum(presta_acp) AS ACTIV_Projet, Sum(presta_rgc) AS Regards_croisés, Sum(presta_vsi) AS Valoriser_son_image_pro,"
+    sql += " Sum(presta_z08+presta_z10+presta_z16) AS Vers1métier, Sum(presta) AS Presta, CONCAT(FORMAT(sum(presta) / Sum(nb_de_affectes) * 100, 1),'%') as tx_prestation"
+    sql+=" FROM T_Activites INNER JOIN APE ON T_Activites.dc_structureprincipalesuivi = APE.id_ape"
+    
+    let sqlValues = [];
+    
+    Object.keys(query).filter((key) => query[key]!=='all').map((key, index) => {
+        
+                if (index === 0) {
+                    sql += ` WHERE ${key} = ?`
+                }
+                else {
+                    sql += ` AND ${key} = ?`
+        
+                } 
+            
+            sqlValues.push(query[key])
+        })
+    
+    sql+= " GROUP BY annee, mois order by annee, mois desc"
+
+    console.log(sql)
     
     connection.query(sql, sqlValues, (err, results) => {
         if (err) {
