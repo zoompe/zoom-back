@@ -13,7 +13,7 @@ router.use('/ide', passport.authenticate('jwt', { session:  false }), (req,resp)
     const query = req.query;
    
     let sql = ""
-        sql += `SELECT dc_individu_local, dc_civilite, dc_nom, dc_prenom, dc_categorie`
+        sql += `SELECT *`
         sql += ' FROM T_Portefeuille INNER JOIN APE ON T_Portefeuille.dc_structureprincipalede = APE.id_ape'
         sql += ' WHERE dc_situationde = 2'
 
@@ -34,15 +34,39 @@ router.use('/ide', passport.authenticate('jwt', { session:  false }), (req,resp)
                     } else {
                 const jsonResult = JSON.parse(JSON.stringify(results));
                 let workbook = new excel.Workbook(); //creating workbook
-                let worksheet = workbook.addWorksheet('IDE'); //creating worksheet
+                let worksheet = workbook.addWorksheet('IDE',{views: [{showGridLines: false}]});; //creating worksheet
+                
                 worksheet.columns = [
-                    { header: 'dc_individu_local', key: 'dc_individu_local', width: 10 },
-                    { header: 'dc_civilite', key: 'dc_civilite', width: 30 },
-                    { header: 'dc_nom', key: 'dc_nom', width: 30},
-                    { header: 'dc_prenom', key: 'dc_prenom', width: 30 },
-                    { header: 'dc_categorie', key: 'dc_categorie', width: 10, outlineLevel: 1}
+                    { header: 'IDE', key: 'dc_individu_local'},
+                    { header: 'APE', key: 'dc_structureprincipalede'},
+                    { header: 'Référent', key: 'dc_dernieragentreferent'},
+                    { header: 'Civilité', key: 'dc_civilite'},
+                    { header: 'Nom', key: 'dc_nom'},
+                    { header: 'Prénom', key: 'dc_prenom'},
+                    { header: 'Catégorie', key: 'dc_categorie'},
+                    { header: 'Situation', key: 'dc_situationde'},
+                    { header: 'Parcours', key: 'dc_parcours'},
+                    { header: 'Mail', key: 'dc_adresseemail'},
+                    { header: 'Tel', key: 'dc_telephone'}
+
                 ];
+
+                worksheet.columns.forEach(column => {
+                    column.width = column.header.length < 5 ? 10 : column.header.length + 2
+                  })
+
                 worksheet.addRows(jsonResult);
+
+                worksheet.getRow(1).eachCell((cell) => {
+                    cell.font = { bold: true };
+                  });
+                  for (let i =1; i<=worksheet.columns.length;i++){
+                  worksheet.getColumn(i).eachCell((cell) => {
+                    cell.border = {
+                        top: { style: 'thin' }, bottom: { style: 'thin' },
+                      };
+                  });
+                }
   
                 resp.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
                 resp.setHeader('Content-Disposition', 'attachment; filename=' + 'diagIde.xlsx');  
@@ -76,7 +100,8 @@ router.use('/ref', passport.authenticate('jwt', { session:  false }), (req,resp)
 //  Group BY p2.dc_dernieragentreferent) as t2 ON t2.dc_dernieragentreferent=t1.dc_dernieragentreferent
 
 
-    let sql = "SELECT t2.dc_dernieragentreferent, CASE WHEN t1.nbDECriteres IS NULL THEN 0 ELSE t1.nbDECriteres END AS nbDECriteres, t2.nbDE, nbDECriteres / t2. nbDE  as tx FROM "
+    let sql = "SELECT t2.dc_dernieragentreferent, CASE WHEN t1.nbDECriteres IS NULL THEN 0 ELSE t1.nbDECriteres END AS nbDECriteres, t2.nbDE," 
+        sql+= ' CASE WHEN (nbDECriteres / t2. nbDE) IS NULL THEN 0 ELSE nbDECriteres / t2. nbDE END AS tx FROM'
         sql += '(SELECT p1.dc_dernieragentreferent, count(p1.dc_individu_local) as nbDECriteres'
         sql += ' FROM T_Portefeuille p1 INNER JOIN APE a1 ON p1.dc_structureprincipalede = a1.id_ape'
         sql += ' WHERE p1.dc_situationde = 2'
@@ -126,15 +151,36 @@ router.use('/ref', passport.authenticate('jwt', { session:  false }), (req,resp)
                     } else {
                 const jsonResult = JSON.parse(JSON.stringify(results));
                 let workbook = new excel.Workbook(); //creating workbook
-                let worksheet = workbook.addWorksheet('REF'); //creating worksheet
+                let worksheet = workbook.addWorksheet('REF',{views: [{showGridLines: false}]});; //creating worksheet
+                
                 worksheet.columns = [
-                    { header: 'dc_dernieragentreferent', key: 'dc_dernieragentreferent', width: 20 },
-                    { header: 'nbDECriteres', key: 'nbDECriteres', width: 10 },
-                    { header: 'nbDE', key: 'nbDE', width: 10},
-                    { header: 'taux', key: 'tx', width: 10 },
-                    
+                    { header: 'Référent', key: 'dc_dernieragentreferent'},
+                    { header: 'Nombre DE avec critères sélectionnés', key: 'nbDECriteres'},
+                    { header: 'Nombre DE en portefeuille', key: 'nbDE'},
+                    { header: 'Taux', key: 'tx'},
+
                 ];
+
+                worksheet.columns.forEach(column => {
+                    column.width = column.header.length < 5 ? 10 : column.header.length + 2
+                  })
+
                 worksheet.addRows(jsonResult);
+
+                worksheet.getRow(1).eachCell((cell) => {
+                    cell.font = { bold: true };
+                  });
+                  for (let i =1; i<=worksheet.columns.length;i++){
+                  worksheet.getColumn(i).eachCell((cell) => {
+                    cell.border = {
+                        top: { style: 'thin' }, bottom: { style: 'thin' },
+                      };
+                  });
+                }
+
+                worksheet.getColumn(4).eachCell((cell) => {
+                    cell.numFmt = '0.0%';
+                  });
   
                 resp.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
                 resp.setHeader('Content-Disposition', 'attachment; filename=' + 'diagRef.xlsx');  
@@ -157,7 +203,8 @@ router.use('/ref', passport.authenticate('jwt', { session:  false }), (req,resp)
 router.use('/ape', passport.authenticate('jwt', { session:  false }), (req,resp) => {
     const query = req.query;
 
-    let sql = "SELECT t2.dc_structureprincipalede, CASE WHEN t1.nbDECriteres IS NULL THEN 0 ELSE t1.nbDECriteres END AS nbDECriteres, t2.nbDE, nbDECriteres / t2. nbDE  as tx FROM "
+    let sql = "SELECT t2.dc_structureprincipalede, CASE WHEN t1.nbDECriteres IS NULL THEN 0 ELSE t1.nbDECriteres END AS nbDECriteres, t2.nbDE, "
+        sql+= ' CASE WHEN (nbDECriteres / t2. nbDE) IS NULL THEN 0 ELSE nbDECriteres / t2. nbDE END AS tx FROM'
         sql += '(SELECT p1.dc_structureprincipalede, count(p1.dc_individu_local) as nbDECriteres'
         sql += ' FROM T_Portefeuille p1 INNER JOIN APE a1 ON p1.dc_structureprincipalede = a1.id_ape'
         sql += ' WHERE p1.dc_situationde = 2'
@@ -207,15 +254,36 @@ router.use('/ape', passport.authenticate('jwt', { session:  false }), (req,resp)
                     } else {
                 const jsonResult = JSON.parse(JSON.stringify(results));
                 let workbook = new excel.Workbook(); //creating workbook
-                let worksheet = workbook.addWorksheet('APE'); //creating worksheet
+                let worksheet = workbook.addWorksheet('APE',{views: [{showGridLines: false}]});; //creating worksheet
+                
                 worksheet.columns = [
-                    { header: 'dc_structureprincipalede', key: 'dc_structureprincipalede', width: 20 },
-                    { header: 'nbDECriteres', key: 'nbDECriteres', width: 10 },
-                    { header: 'nbDE', key: 'nbDE', width: 10},
-                    { header: 'taux', key: 'tx', width: 10 },
-                    
+                    { header: 'APE', key: 'dc_structureprincipalede'},
+                    { header: 'Nombre DE avec critères sélectionnés', key: 'nbDECriteres'},
+                    { header: 'Nombre DE en portefeuille', key: 'nbDE'},
+                    { header: 'Taux', key: 'tx'},
+
                 ];
+
+                worksheet.columns.forEach(column => {
+                    column.width = column.header.length < 5 ? 10 : column.header.length + 2
+                  })
+
                 worksheet.addRows(jsonResult);
+
+                worksheet.getRow(1).eachCell((cell) => {
+                    cell.font = { bold: true };
+                  });
+                  for (let i =1; i<=worksheet.columns.length;i++){
+                  worksheet.getColumn(i).eachCell((cell) => {
+                    cell.border = {
+                        top: { style: 'thin' }, bottom: { style: 'thin' },
+                      };
+                  });
+                }
+
+                worksheet.getColumn(4).eachCell((cell) => {
+                    cell.numFmt = '0.0%';
+                  });
   
                 resp.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
                 resp.setHeader('Content-Disposition', 'attachment; filename=' + 'diagApe.xlsx');  
